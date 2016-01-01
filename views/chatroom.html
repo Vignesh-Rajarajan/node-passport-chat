@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chat Rooms</title>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
+     <script type="text/javascript" src="/socket.io/socket.io.js "></script>
+<script>
+          $(function(){
+            var host='{{config.host}}';
+            console.log(host);
+            var socket= io.connect(host+'/roomlist');
+
+            socket.on('connect',function(){
+                console.log('connection established');
+             })
+            socket.on('roomupdate',function(data){
+                //console.log('connection established');
+                var prodata=JSON.parse(data);
+                for(var i=0;i<prodata.length;i++){
+                    var str='<a href="room/'+prodata[i].room_number+'"><li>'+prodata[i].room_name+'</li></a>';
+                    $('.roomlist').prepend(str);
+                }
+             })
+
+
+
+            $(document).on('click','#create',function(){
+                var room_name= $('.newRoom').val();
+                if(room_name!=null){
+                    var room_number=parseInt(Math.random()*10000);
+                    socket.emit('newroom',{room_name:room_name,room_number:room_number});
+                     $('.newRoom').val('');
+                }
+            })
+          })
+    </script>
+
+</head>
+<body>
+
+<div class="container">
+<h1 class="page-header">Chat cat</h1>
+	<div class="jumbotron ">
+       <img src="{{user.profilePic}}">
+        <h3 >{{user.fullname}} | <a href="/logout">Logout</a> </h3>
+	</div>
+   <div class="container-fluid">
+    
+    <input type="text" class="newRoom" autocomplete="off">
+       <button class="btn btn-success" id="create">create room</button>
+    </div>
+<div class="container">
+    <ul class="roomlist">
+    <!-- <a href="#"><li>NodeJs</li></a>
+         <a href="#"><li>Angular</li></a>
+         <a href="#"><li>html5</li></a> -->
+    
+    </ul>
+    
+    </div>
+
+</div>
+
+
+</body>
+</html>

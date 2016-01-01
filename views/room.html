@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chat Rooms</title>
+     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+     <script>
+          $(function(){
+                     
+                     var host='{{config.host}}';
+                     var messages=io.connect(host+'/messages');
+                     
+                     var roomNum={{room_number}};
+                     var userName='{{user.fullname}}';
+                     var userPic='{{user.profilePic}}';
+               
+                   messages.on('connect',function(){
+                    console.log('connection established');
+                    messages.emit('joinroom',{room:roomNum,user:userName,userPic:userPic})
+                   })
+                   
+                   
+               $(document).on('keyup','.usermsg',function(e){
+              if(e.which===13 && $(this).val()!=''){
+                 messages.emit('newMessage',{
+                 room_number:roomNum,
+                 user:userName,
+                 userPic:userPic,
+                 message:$(this).val()
+                 })
+                 updateUserFeed(userPic,$(this).val());
+                  $(this).val('');
+              
+                 }
+           
+          
+                 })
+                      
+                      function updateUserFeed(userPic,message){
+                          var str='<li>';
+                              str+='<div class="msgbox">';
+                              str+='<div class="pic"><img src="'+userPic+'"></div>';
+                              str+='<div class="msg"><p>'+message+'</p><div>';
+                              str+='</div>';
+                              str+='</li>';
+                          
+                          $(str).prependTo($('.chatbox'));
+                          
+                      }
+                   
+                   
+          })
+          
+       
+
+    </script>
+<style>
+    
+    form, p, span {
+    margin:0;
+    padding:0; }
+    
+    .chatbox {
+    text-align:left;
+    margin:0 auto;
+    margin-bottom:25px;
+    padding:20px;
+    background:#fff;
+    height:270px;
+    width:730px;
+    border:1px solid #ACD8F0;
+    overflow:auto; }
+    
+    #messagebox{
+         
+       
+        border:1px solid #ACD8F0;
+         height:270px;
+        width:120px;
+    }
+    
+    .add{
+        float:right;
+        
+        margin-bottom:25px;
+    padding:20px;
+        overflow:auto;
+    }
+    
+    
+    
+    </style>
+    </head>
+<body>
+
+    
+<div class="container">
+<h1 class="page-header">Chat cat</h1>
+
+	<div class="jumbotron ">
+    <div>
+         <img src="{{user.profilePic}}">
+    </div>
+    <div>
+    <h3>{{room_name}}</h3>
+    </div>
+
+        <h3 >{{user.fullname}} | <a href="/logout">Logout</a>| <a href="/chatroom">more chatrooms</a> </h3>
+	</div>
+
+    <div>
+    <div class="chatbox"></div>
+    </div>
+    
+<div class="add">
+    
+    
+     <div  id="messagebox">
+    <a><img src="{{user.profilePic}}"></a>
+    <p>{{user.fullname}}</p>
+
+    </div>
+    
+    </div>
+    
+<div class="message">
+    
+      <form  action="">
+        <input class="usermsg" type="text" id="usermsg" size="63" />
+        
+    </form>
+    
+    </div>
+
+</body>
+</html>
